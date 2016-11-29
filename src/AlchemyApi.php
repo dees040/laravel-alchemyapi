@@ -473,18 +473,7 @@ class AlchemyApi
      */
     private function analyze($endpoint, $params, $imageData = null)
     {
-        //Insert the base URL
-        $url = $this->baseUrl . $endpoint;
-        $content = http_build_query($params);
-
-        if (! is_null($imageData)) {
-            $url = $url . '?' . http_build_query($params);
-            $content = $imageData;
-        }
-
-        //Add the API Key and set the output mode to JSON
-        $params['apikey'] = $this->apiKey;
-        $params['outputMode'] = 'json';
+        list($url, $content) = $this->createAnalyzeData($endpoint, $params, $imageData);
 
         //Create the HTTP header
         $header = [
@@ -518,6 +507,32 @@ class AlchemyApi
     private function analyzeImage($endpoint, $params, $imageData)
     {
         return $this->analyze($endpoint, $params, $imageData);
+    }
+
+    /**
+     * Create the required api information.
+     *
+     * @param string $endpoint
+     * @param array $params
+     * @param mixed $imageData
+     * @return array
+     */
+    private function createAnalyzeData($endpoint, $params, $imageData)
+    {
+        //Add the API Key and set the output mode to JSON
+        $params['apikey'] = $this->apiKey;
+        $params['outputMode'] = 'json';
+
+        //Insert the base URL
+        $url = $this->baseUrl . $endpoint;
+        $content = http_build_query($params);
+
+        if (! is_null($imageData)) {
+            $url = $url . '?' . http_build_query($params);
+            $content = $imageData;
+        }
+
+        return [$url, $content];
     }
 
     /**
