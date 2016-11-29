@@ -81,7 +81,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function entities($flavor, $data, $options)
+    public function entities($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'entities', 'Entity extraction');
@@ -102,7 +102,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function keywords($flavor, $data, $options)
+    public function keywords($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'keywords', 'Keyword extraction');
@@ -123,7 +123,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function concepts($flavor, $data, $options)
+    public function concepts($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'concepts', 'Concept tagging');
@@ -144,7 +144,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function sentiment($flavor, $data, $options)
+    public function sentiment($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'sentiment', 'Sentiment analysis');
@@ -192,7 +192,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function text($flavor, $data, $options)
+    public function text($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'text', 'Clean text extraction');
@@ -213,7 +213,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function text_raw($flavor, $data, $options)
+    public function text_raw($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'text_raw', 'Raw text extraction');
@@ -234,7 +234,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function author($flavor, $data, $options)
+    public function author($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'author', 'Author extraction');
@@ -256,7 +256,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function language($flavor, $data, $options)
+    public function language($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'language', 'Language detection');
@@ -277,7 +277,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function title($flavor, $data, $options)
+    public function title($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'title', 'Title text extraction');
@@ -298,7 +298,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function relations($flavor, $data, $options)
+    public function relations($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'relations', 'Relation extraction');
@@ -319,7 +319,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function category($flavor, $data, $options)
+    public function category($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'category', 'Text categorization');
@@ -340,7 +340,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function feeds($flavor, $data, $options)
+    public function feeds($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'feeds', 'Feed detection');
@@ -361,7 +361,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function microformats($flavor, $data, $options)
+    public function microformats($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'microformats');
@@ -380,7 +380,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function imageExtraction($flavor, $data, $options)
+    public function imageExtraction($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'image', 'Image Extraction parsing');
@@ -399,7 +399,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function taxonomy($flavor, $data, $options)
+    public function taxonomy($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'taxonomy');
@@ -418,7 +418,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function combined($flavor, $data, $options)
+    public function combined($data, $options, $flavor = 'text')
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'combined');
