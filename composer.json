@@ -19,5 +19,5 @@
       "dees040\\AlchemyApi\\": "src"
     }
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "stable"
 }
