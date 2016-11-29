@@ -3,6 +3,7 @@
 namespace dees040\AlchemyApi;
 
 use dees040\AlchemyApi\Exceptions\AlchemyApiFlavorNotFound;
+use dees040\AlchemyApi\Exceptions\SentimentTargetIsNullable;
 
 class AlchemyApi
 {
@@ -56,7 +57,7 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function image_keywords($flavor, $image, $options)
+    public function imageKeywords($flavor, $image, $options)
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, 'image_keywords', 'Image tagging');
@@ -83,13 +84,10 @@ class AlchemyApi
      */
     public function entities($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'entities', 'Entity extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['entities'][$flavor], $options);
+        return $this->execute($flavor, 'entities', $options, 'Entity extraction');
     }
 
     /**
@@ -104,13 +102,10 @@ class AlchemyApi
      */
     public function keywords($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'keywords', 'Keyword extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['keywords'][$flavor], $options);
+        return $this->execute($flavor, 'keywords', $options, 'Keyword extraction');
     }
 
     /**
@@ -125,13 +120,10 @@ class AlchemyApi
      */
     public function concepts($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'concepts', 'Concept tagging');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['concepts'][$flavor], $options);
+        return $this->execute($flavor, 'concepts', $options, 'Concept tagging');
     }
 
     /**
@@ -146,13 +138,10 @@ class AlchemyApi
      */
     public function sentiment($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'sentiment', 'Sentiment analysis');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['sentiment'][$flavor], $options);
+        return $this->execute($flavor, 'sentiment', $options, 'Sentiment analysis');
     }
 
     /**
@@ -165,21 +154,19 @@ class AlchemyApi
      * @param $target
      * @param $options
      * @return array|mixed
+     * @throws SentimentTargetIsNullable
      */
-    public function sentiment_targeted($flavor, $data, $target, $options)
+    public function sentimentTargeted($flavor, $data, $target, $options)
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'sentiment_targeted', 'Targeted sentiment');
-
         if (! $target) {
-            return ['status' => 'ERROR', 'statusInfo' => 'targeted sentiment requires a non-null target'];
+            throw new SentimentTargetIsNullable("Targeted sentiment requires a non-null target.");
         }
 
         //Add the URL encoded data to the options and analyze
         $options[$flavor] = $data;
         $options['target'] = $target;
 
-        return $this->analyze($this->endpoints['sentiment_targeted'][$flavor], $options);
+        return $this->execute($flavor, 'sentiment_targeted', $options, 'Targeted sentiment');
     }
 
     /**
@@ -194,13 +181,10 @@ class AlchemyApi
      */
     public function text($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'text', 'Clean text extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['text'][$flavor], $options);
+        return $this->execute($flavor, 'text', $options, 'Clean text extraction');
     }
 
     /**
@@ -213,15 +197,12 @@ class AlchemyApi
      * @param $options
      * @return array|mixed
      */
-    public function text_raw($data, $options, $flavor = 'text')
+    public function textRaw($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'text_raw', 'Raw text extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['text_raw'][$flavor], $options);
+        return $this->execute($flavor, 'text_raw', $options, 'Raw text extraction');
     }
 
     /**
@@ -236,13 +217,10 @@ class AlchemyApi
      */
     public function author($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'author', 'Author extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['author'][$flavor], $options);
+        return $this->execute($flavor, 'author', $options, 'Author extraction');
     }
 
 
@@ -258,13 +236,10 @@ class AlchemyApi
      */
     public function language($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'language', 'Language detection');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['language'][$flavor], $options);
+        return $this->execute($flavor, 'language', $options, 'Language detection');
     }
 
     /**
@@ -279,13 +254,10 @@ class AlchemyApi
      */
     public function title($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'title', 'Title text extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['title'][$flavor], $options);
+        return $this->execute($flavor, 'title', $options, 'Title text extraction');
     }
 
     /**
@@ -300,13 +272,10 @@ class AlchemyApi
      */
     public function relations($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'relations', 'Relation extraction');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['relations'][$flavor], $options);
+        return $this->execute($flavor, 'relations', $options, 'Relation extraction');
     }
 
     /**
@@ -321,13 +290,10 @@ class AlchemyApi
      */
     public function category($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'category', 'Text categorization');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['category'][$flavor], $options);
+        return $this->execute($flavor, 'category', $options, 'Text categorization');
     }
 
     /**
@@ -342,13 +308,10 @@ class AlchemyApi
      */
     public function feeds($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'feeds', 'Feed detection');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['feeds'][$flavor], $options);
+        return $this->execute($flavor, 'feeds', $options, 'Feed detection');
     }
 
     /**
@@ -363,13 +326,10 @@ class AlchemyApi
      */
     public function microformats($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'microformats');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['microformats'][$flavor], $options);
+        return $this->execute($flavor, 'microformats', $options);
     }
 
     /**
@@ -382,13 +342,10 @@ class AlchemyApi
      */
     public function imageExtraction($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'image', 'Image Extraction parsing');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['image'][$flavor], $options);
+        return $this->execute($flavor, 'image', $options, 'Image Extraction parsing');
     }
 
     /**
@@ -401,13 +358,10 @@ class AlchemyApi
      */
     public function taxonomy($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'taxonomy');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['taxonomy'][$flavor], $options);
+        return $this->execute($flavor, 'taxonomy', $options);
     }
 
     /**
@@ -420,13 +374,27 @@ class AlchemyApi
      */
     public function combined($data, $options, $flavor = 'text')
     {
-        //Make sure this request supports the flavor
-        $this->throwExceptionOnUnknownFlavor($flavor, 'combined');
-
         //Add the data to the options and analyze
         $options[$flavor] = $data;
 
-        return $this->analyze($this->endpoints['combined'][$flavor], $options);
+        return $this->execute($flavor, 'combined', $options);
+    }
+
+    /**
+     * Execute the before analyze function.
+     *
+     * @param $flavor
+     * @param $options
+     * @param $endpoint
+     * @param null $error
+     * @return array|mixed
+     */
+    private function execute($flavor, $options, $endpoint, $error = null)
+    {
+        //Make sure this request supports the flavor
+        $this->throwExceptionOnUnknownFlavor($flavor, $endpoint, $error);
+
+        return $this->analyze($this->getFullEndPoint($endpoint, $flavor), $options);
     }
 
     /**
@@ -533,6 +501,18 @@ class AlchemyApi
         }
 
         return [$url, $content];
+    }
+
+    /**
+     * Get the a flavor of the given endpoint.
+     *
+     * @param $endpoint
+     * @param $flavor
+     * @return mixed
+     */
+    private function getFullEndPoint($endpoint, $flavor)
+    {
+        return $this->endpoints[$endpoint][$flavor];
     }
 
     /**
