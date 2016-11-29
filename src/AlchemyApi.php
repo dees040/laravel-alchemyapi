@@ -389,28 +389,12 @@ class AlchemyApi
      * @param null $error
      * @return array|mixed
      */
-    private function execute($flavor, $options, $endpoint, $error = null)
+    private function execute($flavor, $endpoint, $options, $error = null)
     {
         //Make sure this request supports the flavor
         $this->throwExceptionOnUnknownFlavor($flavor, $endpoint, $error);
 
         return $this->analyze($this->getFullEndPoint($endpoint, $flavor), $options);
-    }
-
-    /**
-     * Indicate if flavor exists for given endpoint.
-     *
-     * @param string $flavor
-     * @param string $endpoint
-     * @return bool
-     */
-    private function hasFlavor($flavor, $endpoint)
-    {
-        if (! array_key_exists($flavor, $this->endpoints[$endpoint])) {
-            return false;
-        }
-
-        return true;
     }
 
     /**
@@ -428,6 +412,22 @@ class AlchemyApi
                 sprintf("%s for %s not available", $errorStart ?: $endpoint . ' parsing', $flavor)
             );
         }
+    }
+
+    /**
+     * Indicate if flavor exists for given endpoint.
+     *
+     * @param string $flavor
+     * @param string $endpoint
+     * @return bool
+     */
+    private function hasFlavor($flavor, $endpoint)
+    {
+        if (! array_key_exists($flavor, $this->endpoints[$endpoint])) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
