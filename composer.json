@@ -14,5 +14,10 @@
       "email": "dees@owow.io"
     }
   ],
+  "autoload": {
+    "psr-4": {
+      "dees040\\AlchemyApi\\": "src"
+    }
+  },
   "minimum-stability": "dev"
 }

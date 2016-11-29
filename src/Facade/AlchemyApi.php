@@ -12,6 +12,6 @@ class AlchemyApi extends Facade
      * @return string
      */
     protected static function getFacadeAccessor() {
-        return 'dees040\AlchemyAPI\AlchemyAPI';
+        return 'dees040\AlchemyApi\AlchemyApi';
     }
 }

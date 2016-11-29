@@ -1,8 +1,8 @@
 <?php
 
-namespace dees040\AlchemyAPI;
+namespace dees040\AlchemyApi;
 
-class AlchemyAPI
+class AlchemyApi
 {
     /**
      * The API key.

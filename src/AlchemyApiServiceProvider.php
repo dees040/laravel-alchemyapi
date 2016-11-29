@@ -1,6 +1,6 @@
 <?php
 
-namespace dees040\AlchemyAPI;
+namespace dees040\AlchemyApi;
 
 use Illuminate\Support\ServiceProvider;
 
@@ -13,8 +13,8 @@ class AlchemyApiServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->bind('dees040\AlchemyAPI\AlchemyAPI', function ($app) {
-            return new \dees040\AlchemyAPI\AlchemyAPI();
+        $this->app->bind('dees040\AlchemyApi\AlchemyApi', function ($app) {
+            return new \dees040\AlchemyApi\AlchemyApi();
         });
     }
 
