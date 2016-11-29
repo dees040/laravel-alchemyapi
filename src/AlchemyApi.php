@@ -2,6 +2,8 @@
 
 namespace dees040\AlchemyApi;
 
+use dees040\AlchemyApi\Exceptions\AlchemyApiFlavorNotFound;
+
 class AlchemyApi
 {
     /**
@@ -9,7 +11,7 @@ class AlchemyApi
      *
      * @var string
      */
-    private $_api_key;
+    private $apiKey;
 
     /**
      * Array with endpoints.
@@ -19,19 +21,11 @@ class AlchemyApi
     private $endpoints;
 
     /**
+     * The base url to send the api requests to.
+     *
      * @var string
      */
-    private $_base_url;
-
-    /**
-     * @var string
-     */
-    private $_BASE_HTTP_URL = 'http://access.alchemyapi.com/calls';
-
-    /**
-     * @var string
-     */
-    private $_BASE_HTTPS_URL = 'https://access.alchemyapi.com/calls';
+    private $baseUrl = 'http://access.alchemyapi.com/calls';
 
     /**
      * Constructor
@@ -42,9 +36,11 @@ class AlchemyApi
      */
     public function __construct($key = null, $use_https = false)
     {
-        $this->_api_key = $key ?: env('ALCHEMYAPI_KEY');
+        $this->apiKey = $key ?: env('ALCHEMYAPI_KEY');
 
-        $this->_base_url = $use_https ? $this->_BASE_HTTPS_URL : $this->_BASE_HTTP_URL;
+        if ($use_https) {
+            $this->baseUrl = str_replace('http', 'https', $this->baseUrl);
+        }
 
         //Initialize the API Endpoints
         $this->endpoints = require(__DIR__ . DIRECTORY_SEPARATOR . 'endpoints.php');
@@ -63,9 +59,7 @@ class AlchemyApi
     public function image_keywords($flavor, $image, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'image_keywords')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Image tagging for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'image_keywords', 'Image tagging');
 
         //Add the image to the options and analyze
         if ($flavor == 'url') {
@@ -90,9 +84,7 @@ class AlchemyApi
     public function entities($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'entities')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Entity extraction for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'entities', 'Entity extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -113,9 +105,7 @@ class AlchemyApi
     public function keywords($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'keywords')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Keyword extraction for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'keywords', 'Keyword extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -136,9 +126,7 @@ class AlchemyApi
     public function concepts($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'concepts')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Concept tagging for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'concepts', 'Concept tagging');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -159,9 +147,7 @@ class AlchemyApi
     public function sentiment($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'sentiment')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Sentiment analysis for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'sentiment', 'Sentiment analysis');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -183,9 +169,7 @@ class AlchemyApi
     public function sentiment_targeted($flavor, $data, $target, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'sentiment_targeted')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Targeted sentiment analysis for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'sentiment_targeted', 'Targeted sentiment');
 
         if (! $target) {
             return ['status' => 'ERROR', 'statusInfo' => 'targeted sentiment requires a non-null target'];
@@ -211,9 +195,7 @@ class AlchemyApi
     public function text($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'text')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Clean text extraction for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'text', 'Clean text extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -234,9 +216,7 @@ class AlchemyApi
     public function text_raw($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'text_raw')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Raw text extraction for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'text_raw', 'Raw text extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -257,9 +237,7 @@ class AlchemyApi
     public function author($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'author')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Author extration for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'author', 'Author extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -281,9 +259,7 @@ class AlchemyApi
     public function language($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'language')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Language detection for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'language', 'Language detection');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -304,9 +280,7 @@ class AlchemyApi
     public function title($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'title')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Title text extraction for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'title', 'Title text extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -327,9 +301,7 @@ class AlchemyApi
     public function relations($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'relations')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Relation extraction for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'relations', 'Relation extraction');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -350,9 +322,7 @@ class AlchemyApi
     public function category($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'category')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Text categorization for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'category', 'Text categorization');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -373,9 +343,7 @@ class AlchemyApi
     public function feeds($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'feeds')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Feed detection for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'feeds', 'Feed detection');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -396,9 +364,7 @@ class AlchemyApi
     public function microformats($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'microformats')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Microformat parsing for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'microformats');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -417,9 +383,7 @@ class AlchemyApi
     public function imageExtraction($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'image')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Image Extraction parsing for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'image', 'Image Extraction parsing');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -438,9 +402,7 @@ class AlchemyApi
     public function taxonomy($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'taxonomy')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'taxonomy parsing for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'taxonomy');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -459,9 +421,7 @@ class AlchemyApi
     public function combined($flavor, $data, $options)
     {
         //Make sure this request supports the flavor
-        if (! $this->hasFlavor($flavor, 'combined')) {
-            return ['status' => 'ERROR', 'statusInfo' => 'combined parsing for ' . $flavor . ' not available'];
-        }
+        $this->throwExceptionOnUnknownFlavor($flavor, 'combined');
 
         //Add the data to the options and analyze
         $options[$flavor] = $data;
@@ -472,8 +432,8 @@ class AlchemyApi
     /**
      * Indicate if flavor exists for given endpoint.
      *
-     * @param $flavor
-     * @param $endpoint
+     * @param string $flavor
+     * @param string $endpoint
      * @return bool
      */
     private function hasFlavor($flavor, $endpoint)
@@ -486,24 +446,54 @@ class AlchemyApi
     }
 
     /**
+     * Throw an exception if we have an unknown flavor.
+     *
+     * @param string $flavor
+     * @param string $endpoint
+     * @param null $errorStart
+     * @throws AlchemyApiFlavorNotFound
+     */
+    private function throwExceptionOnUnknownFlavor($flavor, $endpoint, $errorStart = null)
+    {
+        if (! $this->hasFlavor($flavor, $endpoint)) {
+            throw new AlchemyApiFlavorNotFound(
+                sprintf("%s for %s not available", $errorStart ?: $endpoint . ' parsing', $flavor)
+            );
+        }
+    }
+
+    /**
      * HTTP Request wrapper that is called by the endpoint functions. This function is not intended to be called
      * through an external interface. It makes the call, then converts the returned JSON string into a PHP object.
      *
      * @param $endpoint
      * @param $params
+     * @param null $imageData
      * @return array|mixed
      */
-    private function analyze($endpoint, $params)
+    private function analyze($endpoint, $params, $imageData = null)
     {
         //Insert the base URL
-        $url = $this->_base_url . $endpoint;
+        $url = $this->baseUrl . $endpoint;
+        $content = http_build_query($params);
+
+        if (! is_null($imageData)) {
+            $url = $url . '?' . http_build_query($params);
+            $content = $imageData;
+        }
 
         //Add the API Key and set the output mode to JSON
-        $params['apikey'] = $this->_api_key;
+        $params['apikey'] = $this->apiKey;
         $params['outputMode'] = 'json';
 
         //Create the HTTP header
-        $header = ['http' => ['method' => 'POST', 'header' => 'Content-Type: application/x-www-form-urlencode', 'content' => http_build_query($params)]];
+        $header = [
+            'http' => [
+                'method' => 'POST',
+                'header' => 'Content-Type: application/x-www-form-urlencode',
+                'content' => $content
+            ]
+        ];
 
         //Fire off the HTTP Request
         try {
@@ -527,25 +517,19 @@ class AlchemyApi
      */
     private function analyzeImage($endpoint, $params, $imageData)
     {
-        //Add the API Key and set the output mode to JSON
-        $params['apikey'] = $this->_api_key;
-        $params['outputMode'] = 'json';
+        return $this->analyze($endpoint, $params, $imageData);
+    }
 
-        //Insert the base URL
-        $url = $this->_base_url . $endpoint . '?' . http_build_query($params);
+    /**
+     * Set the key dynamically.
+     *
+     * @param $key
+     * @return AlchemyApi
+     */
+    public function setKey($key)
+    {
+        $this->apiKey = $key;
 
-        //Create the HTTP header
-        $header = ['http' => ['method' => 'POST', 'header' => 'Content-Type: application/x-www-form-urlencode', 'content' => $imageData]];
-
-        //Fire off the HTTP Request
-        try {
-            $fp = @fopen($url, 'rb', false, stream_context_create($header));
-            $response = @stream_get_contents($fp);
-            fclose($fp);
-
-            return json_decode($response, true);
-        } catch (\Exception $e) {
-            return ['status' => 'ERROR', 'statusInfo' => 'Network error'];
-        }
+        return $this;
     }
 }
