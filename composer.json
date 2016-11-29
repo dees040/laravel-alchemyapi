@@ -1,0 +1,18 @@
+{
+  "name": "dees040/alchemy-api",
+  "description": "Laravel wrapper for the AlchemyAPI.",
+  "type": "library",
+  "license": "Apache",
+  "keywords": [
+    "laravel",
+    "AlchemyAPI",
+    "laravel-alchemy-api"
+  ],
+  "authors": [
+    {
+      "name": "dees040",
+      "email": "dees@owow.io"
+    }
+  ],
+  "minimum-stability": "dev"
+}
