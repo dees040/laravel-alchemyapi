@@ -2,7 +2,7 @@
   "name": "dees040/alchemy-api",
   "description": "Laravel wrapper for the AlchemyAPI.",
   "type": "library",
-  "license": "Apache",
+  "license": "Beerware",
   "keywords": [
     "laravel",
     "AlchemyAPI",
